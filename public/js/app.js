@@ -1104,8 +1104,9 @@ var app = new Vue({
 
 /***/ }),
 /* 12 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
 
 window._ = __webpack_require__(13);
 
@@ -43289,20 +43290,31 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
         return {
             articles: [],
+            error: '',
+            article_id: '',
+            pagination: {},
+            edit: false,
+            loading: true,
 
             article: {
                 title: '',
                 body: ''
-            },
-
-            article_id: '',
-            pagination: {},
-            edit: false
+            }
         };
     },
     created: function created() {
@@ -43318,6 +43330,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             axios.get(page_url).then(function (response) {
                 _this.articles = response.data;
                 _this.makePagination(response.data.meta, response.data.links);
+                _this.loading = false;
             }).catch(function (err) {
                 return console.log(err);
             });
@@ -43351,8 +43364,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 });
             }
         },
-        addArticle: function addArticle() {
+        addArticle: function addArticle(e) {
             var _this3 = this;
+
+            if (!this.title || !this.body) {
+                this.error = 'Both fields are required';
+            }
 
             if (this.edit === false) {
                 axios({
@@ -43472,6 +43489,8 @@ var render = function() {
           2
         ),
         _vm._v(" "),
+        _vm.loading ? _c("h3", [_vm._v("Loading....")]) : _vm._e(),
+        _vm._v(" "),
         _vm._l(_vm.articles.data, function(article) {
           return _c(
             "div",
@@ -43500,7 +43519,7 @@ var render = function() {
                 _c(
                   "button",
                   {
-                    staticClass: "btn btn-default col-sm-2",
+                    staticClass: "btn btn-success col-sm-2",
                     on: {
                       click: function($event) {
                         _vm.editArticle(article)
@@ -43521,6 +43540,22 @@ var render = function() {
       "div",
       { staticClass: "col-3", staticStyle: { "margin-top": "100px" } },
       [
+        _vm.error
+          ? _c(
+              "div",
+              {
+                staticClass: "alert alert-danger alert-dismissible",
+                attrs: { role: "alert" }
+              },
+              [
+                _vm._m(2),
+                _vm._v(
+                  "\r\n            " + _vm._s(_vm.error) + "\r\n            "
+                )
+              ]
+            )
+          : _vm._e(),
+        _vm._v(" "),
         _c(
           "form",
           {
@@ -43584,8 +43619,8 @@ var render = function() {
             _c(
               "button",
               {
-                staticClass: "btn btn-light btn-block",
-                attrs: { type: "submit" }
+                staticClass: "btn btn-info btn-block",
+                attrs: { type: "submit", disabled: _vm.error !== "" }
               },
               [_vm._v("Save")]
             )
@@ -43638,6 +43673,23 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("span", { staticClass: "sr-only" }, [_vm._v("Next")])
       ]
+    )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "button",
+      {
+        staticClass: "close",
+        attrs: {
+          type: "button",
+          "data-dismiss": "alert",
+          "aria-label": "Close"
+        }
+      },
+      [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
     )
   }
 ]

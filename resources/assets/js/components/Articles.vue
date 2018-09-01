@@ -25,6 +25,7 @@
             </li>
         </ul>
 
+            <h3 v-if= "loading">Loading....</h3>
 
             <div class="card card-body mb-5" v-for="article in articles.data" v-bind:key="article.id">
                 <h3>{{ article.title }}</h3>
@@ -32,22 +33,31 @@
                 <hr>
                 <div>
                     <button class="btn btn-danger col-sm-2" v-on:click="deleteArticle(article)">Delete</button>
-                    <button v-on:click="editArticle(article)"  class="btn btn-default col-sm-2">Edit</button>
+                    <button v-on:click="editArticle(article)"  class="btn btn-success col-sm-2">Edit</button>
                 </div>   
             </div>
+
         </div>
 
 
 
         <div class="col-3" style="margin-top:100px">
-            <form @submit.prevent="addArticle" class="mb-3">
+
+            <div class="alert alert-danger alert-dismissible" role="alert" v-if="error">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            {{error}}
+            </div>
+
+            <form @submit.prevent ="addArticle" class="mb-3">
             <div class="form-group">
                 <input type="text" class="form-control" placeholder="Title" v-model="article.title">
             </div>
             <div class="form-group">
                 <textarea class="form-control" placeholder="Body" v-model="article.body"></textarea>
             </div>
-                <button type="submit" class="btn btn-light btn-block">Save</button>
+                <button type="submit" class="btn btn-info btn-block" v-bind:disabled="error !== ''">Save</button>
             </form>
                 <button @click="clearForm()" class="btn btn-danger btn-block">Cancel</button>
         </div>
@@ -63,15 +73,16 @@ export default {
     data(){
         return {
             articles: [],
+            error: '',
+            article_id: '',
+            pagination: {},
+            edit: false,
+            loading: true,
 
             article: {
                 title: '',
                 body: ''
-            },
-            
-            article_id: '',
-            pagination: {},
-            edit: false,
+            }
         }
     },
 
@@ -89,7 +100,8 @@ export default {
             axios.get(page_url)
             .then((response) =>{
                 this.articles = response.data;
-                this.makePagination(response.data.meta, response.data.links)
+                this.makePagination(response.data.meta, response.data.links);
+                this.loading = false
             })
             .catch(err => console.log(err))
         },
@@ -126,7 +138,13 @@ export default {
         },
 
 
-        addArticle(){
+        addArticle(e){
+
+            if(!this.title || !this.body){
+                this.error = 'Both fields are required'
+            }
+
+
             if(this.edit === false){
                 axios({
                     method: 'post',
