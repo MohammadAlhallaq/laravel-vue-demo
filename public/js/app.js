@@ -1104,9 +1104,8 @@ var app = new Vue({
 
 /***/ }),
 /* 12 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
 
 window._ = __webpack_require__(13);
 
@@ -43294,16 +43293,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-//
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     data: function data() {
         return {
+
             articles: [],
             error: '',
             article_id: '',
@@ -43322,6 +43316,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     },
 
 
+    computed: {
+        isDisabled: function isDisabled() {
+            return this.article.title.length && this.article.body.length;
+        }
+    },
+
     methods: {
         fetchArticles: function fetchArticles(page_url) {
             var _this = this;
@@ -43331,6 +43331,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 _this.articles = response.data;
                 _this.makePagination(response.data.meta, response.data.links);
                 _this.loading = false;
+                console.log(_this.pagination);
             }).catch(function (err) {
                 return console.log(err);
             });
@@ -43366,10 +43367,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         },
         addArticle: function addArticle(e) {
             var _this3 = this;
-
-            if (!this.title || !this.body) {
-                this.error = 'Both fields are required';
-            }
 
             if (this.edit === false) {
                 axios({
@@ -43435,19 +43432,20 @@ var render = function() {
           "ul",
           { staticClass: "pagination" },
           [
-            _c(
-              "li",
-              {
-                staticClass: "page-item",
-                class: [{ disabled: !_vm.pagination.prev_page }],
-                on: {
-                  click: function($event) {
-                    _vm.fetchArticles(_vm.pagination.prev_page)
-                  }
-                }
-              },
-              [_vm._m(0)]
-            ),
+            _vm.pagination.prev_page
+              ? _c(
+                  "li",
+                  {
+                    staticClass: "page-item",
+                    on: {
+                      click: function($event) {
+                        _vm.fetchArticles(_vm.pagination.prev_page)
+                      }
+                    }
+                  },
+                  [_vm._m(0)]
+                )
+              : _vm._e(),
             _vm._v(" "),
             _vm._l(_vm.pagination.last_page, function(n) {
               return _c("div", [
@@ -43472,19 +43470,20 @@ var render = function() {
               ])
             }),
             _vm._v(" "),
-            _c(
-              "li",
-              {
-                staticClass: "page-item",
-                class: [{ disabled: !_vm.pagination.next_page }],
-                on: {
-                  click: function($event) {
-                    _vm.fetchArticles(_vm.pagination.next_page)
-                  }
-                }
-              },
-              [_vm._m(1)]
-            )
+            _vm.pagination.next_page
+              ? _c(
+                  "li",
+                  {
+                    staticClass: "page-item",
+                    on: {
+                      click: function($event) {
+                        _vm.fetchArticles(_vm.pagination.next_page)
+                      }
+                    }
+                  },
+                  [_vm._m(1)]
+                )
+              : _vm._e()
           ],
           2
         ),
@@ -43540,22 +43539,6 @@ var render = function() {
       "div",
       { staticClass: "col-3", staticStyle: { "margin-top": "100px" } },
       [
-        _vm.error
-          ? _c(
-              "div",
-              {
-                staticClass: "alert alert-danger alert-dismissible",
-                attrs: { role: "alert" }
-              },
-              [
-                _vm._m(2),
-                _vm._v(
-                  "\r\n            " + _vm._s(_vm.error) + "\r\n            "
-                )
-              ]
-            )
-          : _vm._e(),
-        _vm._v(" "),
         _c(
           "form",
           {
@@ -43620,7 +43603,7 @@ var render = function() {
               "button",
               {
                 staticClass: "btn btn-info btn-block",
-                attrs: { type: "submit", disabled: _vm.error !== "" }
+                attrs: { type: "submit", disabled: !_vm.isDisabled }
               },
               [_vm._v("Save")]
             )
@@ -43673,23 +43656,6 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("span", { staticClass: "sr-only" }, [_vm._v("Next")])
       ]
-    )
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c(
-      "button",
-      {
-        staticClass: "close",
-        attrs: {
-          type: "button",
-          "data-dismiss": "alert",
-          "aria-label": "Close"
-        }
-      },
-      [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
     )
   }
 ]

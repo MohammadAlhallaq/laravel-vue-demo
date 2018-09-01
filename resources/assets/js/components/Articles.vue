@@ -5,7 +5,7 @@
             <h2>Articles</h2>
         
         <ul class="pagination">
-            <li class="page-item" v-bind:class="[{disabled: !pagination.prev_page}]" v-on:click="fetchArticles(pagination.prev_page)">
+            <li class="page-item" v-if="pagination.prev_page" v-on:click="fetchArticles(pagination.prev_page)">
             <a class="page-link" href="#" aria-label="Previous">
                 <span aria-hidden="true">&laquo;</span>
                 <span class="sr-only">Previous</span>
@@ -17,7 +17,7 @@
             </div>
             
 
-            <li class="page-item" v-bind:class="[{disabled: !pagination.next_page}]" v-on:click="fetchArticles(pagination.next_page)">
+            <li class="page-item" v-on:click="fetchArticles(pagination.next_page)"  v-if="pagination.next_page">
             <a class="page-link" href="#" aria-label="Next">
                 <span aria-hidden="true">&raquo;</span>
                 <span class="sr-only">Next</span>
@@ -43,12 +43,6 @@
 
         <div class="col-3" style="margin-top:100px">
 
-            <div class="alert alert-danger alert-dismissible" role="alert" v-if="error">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-            {{error}}
-            </div>
 
             <form @submit.prevent ="addArticle" class="mb-3">
             <div class="form-group">
@@ -57,7 +51,7 @@
             <div class="form-group">
                 <textarea class="form-control" placeholder="Body" v-model="article.body"></textarea>
             </div>
-                <button type="submit" class="btn btn-info btn-block" v-bind:disabled="error !== ''">Save</button>
+                <button type="submit" class="btn btn-info btn-block" v-bind:disabled="!isDisabled">Save</button>
             </form>
                 <button @click="clearForm()" class="btn btn-danger btn-block">Cancel</button>
         </div>
@@ -72,6 +66,7 @@
 export default {
     data(){
         return {
+
             articles: [],
             error: '',
             article_id: '',
@@ -91,6 +86,12 @@ export default {
         this.fetchArticles();
     },
 
+    computed:{
+        isDisabled(){
+        return this.article.title.length && this.article.body.length;
+        }
+    },
+
 
 
     methods: {
@@ -101,7 +102,9 @@ export default {
             .then((response) =>{
                 this.articles = response.data;
                 this.makePagination(response.data.meta, response.data.links);
-                this.loading = false
+                this.loading = false;
+                console.log(this.pagination);
+
             })
             .catch(err => console.log(err))
         },
@@ -139,11 +142,6 @@ export default {
 
 
         addArticle(e){
-
-            if(!this.title || !this.body){
-                this.error = 'Both fields are required'
-            }
-
 
             if(this.edit === false){
                 axios({
